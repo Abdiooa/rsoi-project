@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h3 class="text-center mt-5 font-weight-bold">Users</h3>
+    <br>
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col"><b>Name</b></th>
+                <th scope="col"><b>Surname</b></th>
+                <th scope="col"><b>UUID</b></th>
+                <th scope="col"><b>Role</b></th>
+                <th scope="col"><b>E-mail</b></th>
+                <th scope="col"><b>Username</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in all_users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.last_name }}</td>
+                <td>{{ user.user_uid }}</td>
+                <td>{{ user.role }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+{% block sidebar %}
+{% endblock %}

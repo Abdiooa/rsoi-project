@@ -1,0 +1,84 @@
+{% extends 'autre.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="col-12 mt-3">
+        <div class="text-center">
+            <h3 style="font-weight: bold">{{ title }}</h3>
+        </div>
+    {% if allhotels %}
+        {% for hotel in page_obj %}
+            {% if request.COOKIES.jwt %}
+                {% if user.role == 'admin' %}
+                <div class="card my-4 p-2">
+                    <div class="card-body">
+                        <h5 class="card-title">{{hotel.name}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{hotel.city}}, {{hotel.country}}</h6>
+                        <p class="card-text">{{hotel.address}}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p class="card-text"><i class="fas fa-star"></i> {{hotel.stars}}</p>
+                            </div>
+                            <div class="col-4">
+                                <p class="card-text text-end fw-bold">${{hotel.price}}/night</p>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-6">
+                                <button class="btn btn-outline-secondary" onclick="copyToClipboard('{{ hotel.hotelUid }}')">
+                                    <i class="far fa-clipboard"></i> Copy Hotel_UID
+                                </button>
+                            </div>
+                            <div class="col-6 text-end">
+                                <a href="{% url 'hotel_info' hotel.hotelUid %}" class="btn btn-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% else %}
+                <div class="card my-4 p-2">
+                    <div class="card-body">
+                        <h5 class="card-title">{{hotel.name}}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{hotel.city}}, {{hotel.country}}</h6>
+                        <p class="card-text">{{hotel.address}}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p class="card-text"><i class="fas fa-star"></i> {{hotel.stars}}</p>
+                            </div>
+                            <div class="col-4">
+                                <p class="card-text text-end fw-bold">${{hotel.price}}/night</p>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'hotel_info' hotel.hotelUid %}" class="btn btn-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+        {%block pagination%}
+            {% include "pagination.html" %}
+        {%endblock%}
+    {% endif %}
+    </div>
+    <script>
+        function copyToClipboard(text) {
+            var dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            alert("hotelUid copied");
+        }
+    </script>
+{% endblock %}
+

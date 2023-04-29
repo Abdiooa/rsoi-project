@@ -1,0 +1,31 @@
+version: 13.8
+port: 5432
+
+default_database:
+  name: postgres
+  user: postgres
+  password: postgres
+
+users:
+  - name: program
+    password: test
+
+datases:
+  - name: loyalties
+    user: program
+  - name: payments
+    user: program
+  - name: reservations
+    user: program
+  - name: session
+    user: program
+  - name: reports
+    user: program
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

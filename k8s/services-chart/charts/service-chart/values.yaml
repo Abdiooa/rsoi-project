@@ -1,0 +1,20 @@
+domain: com
+service:
+  port: 8090
+  isGateway:
+  image:
+    name:
+    version:
+  database:
+    name:
+    host: postgres
+    port: 5432
+    username: postgres
+    password: postgres
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi

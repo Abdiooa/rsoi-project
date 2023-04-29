@@ -1,0 +1,102 @@
+{% extends 'autre.html' %}
+{% load static %}
+
+{% block content %}
+<div class="mx-auto col-md-8 mt-3">
+    {% if bookdel %}
+        <div class="alert alert-success">{{ bookdel }}</div>
+        <a href="{% url 'index' %}" class="btn btn-info">To start page</a>
+        <a href="{% url 'balance' %}" class="btn btn-info">Personal Area</a>
+    {% elif bookerror %}
+        <div class="alert alert-danger">{{ bookerror }}</div>
+            <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="retour"/>
+    {% else %}
+        <div class="p-2 my-3">
+            <h4 class=" text-center text-wrap text-break" style="font-weight: bold">Hotel reservation
+                <a href={% url 'hotel_info' hotel.hotelUid %}><h4 style="font-weight: bold">{{hotel.name}}</h4></a>
+            </h4>
+        </div>
+        <div class="alert alert-light font">
+        {% if suc or success %}
+            <div class="alert alert-success">{{ suc }}{{ success }}</div>
+        {% else %}
+            {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endif %}
+            <table class = "table">
+                <tr>
+                    <th scope="col" class="w-25" style="border: none;">Country:</th>
+                    <td style="border: none;">{{ hotel.country }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="w-25">City:</th>
+                    <td>{{ hotel.city }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="w-25">Address:</th>
+                    <td>{{ hotel.address }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="w-25">Arrival date:</th>
+                    <td>{{ booking.startDate }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="w-25">Departure date:</th>
+                    <td>{{ booking.endDate }}</td>
+                </tr>
+                <tr>
+                    <th scope="col" class="w-25">Status:</th>
+                    <td>{{ payment.status }}</td>
+                </tr>
+                {% if payment.status == "PAID" %}
+                    <tr>
+                        <th scope="col" class="w-25">Paid:</th>
+                        <td>{{ totalcost }}</td>
+                    </tr>
+                {% endif %}
+            </table>
+            {% if payment.status == "NEW" %}
+                <h6>To pay: {{ totalcost }}</h6><br>
+            {% endif %}
+            <div class="row">
+                {% if payment.status == "NEW" %}
+                    <div class="col-6">
+                        <form id="payment" action="{% url 'pay_room' payment.paymentUid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="reservationUid" value="{{ booking.reservationUid }}">
+                            <input type="hidden" name="totalcost" value="{{ totalcost }}">
+                            <input type="submit" class="btn btn-success mr-2" value="Pay">
+                        </form>
+                    </div>
+                {% endif %}
+                {% if payment.status == "NEW" %}
+                    <div class="col-6">
+                        <form class="d-flex justify-content-end" id="del" action="{% url 'del_booking' booking.reservationUid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="{{ payment.status }}">
+                            <input type="hidden" name="booking" value="{{ booking }}">
+                            <input type="hidden" name="hotel" value="{{ hotel }}">
+                            <input type="hidden" name="payment" value="{{ payment }}">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Cancel reservation">
+                        </form>
+                    </div>
+                {% elif payment.status == "PAID" %}
+                    <div class="col-12">
+                        <form class="d-flex justify-content-end" id="del" action="{% url 'del_booking' booking.reservationUid %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="status" value="{{ payment.status }}">
+                            <input type="hidden" name="booking" value="{{ booking }}">
+                            <input type="hidden" name="hotel" value="{{ hotel }}">
+                            <input type="hidden" name="payment" value="{{ payment }}">
+                            <input type="submit" onclick="del_booking()" class="btn btn-danger" value="Cancel reservation">
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endif %}
+        </div>
+        <a href="{% url 'balance' %}" class="btn btn-info">My reservations</a>
+    {% endif %}
+</div>
+{% endblock %}

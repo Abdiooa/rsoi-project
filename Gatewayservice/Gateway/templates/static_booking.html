@@ -1,0 +1,45 @@
+{% extends "autre.html" %}
+{% load static %}
+
+{% block title %}
+    Static booking
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3 class="text-center" style="margin-top: 30px; font-weight: bold">Statistic create booking</h3>
+        {% if static_booking %}
+            <div class="row row-cols-1 row-cols-md-3 g-4" style="margin-top: 30px;">
+                {% for booking in static_booking %}
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h5 class="card-title">{{ booking.1.name }}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">{{ booking.1.city }}, {{ booking.1.country }}</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Booking UUID: {{ booking.1.reservationUid }}</p>
+                                <p class="card-text">Hotel UUID: {{ booking.1.hotel_uid }}</p>
+                                <p class="card-text">User UUID: {{ booking.1.user_uid }}</p>
+                                <p class="card-text">Payment UUID: {{ booking.1.paymentUid }}</p>
+                                <p class="card-text">Start Date: {{ booking.1.startDate }}</p>
+                                <p class="card-text">End Date: {{ booking.1.endDate }}</p>
+                                <p class="card-text">Status: {{ booking.1.status }}</p>
+                                <p class="card-text">Price: {{ booking.1.price }}</p>
+                                <p class="card-text">Username: {{ booking.1.username }}</p>
+                                <p class="card-text">Email: {{ booking.1.email }}</p>
+                                <p class="card-text">Status Loyalty: {{ booking.1.status_loyalty }}</p>
+                                <p class="card-text">Discount: {{ booking.1.discount }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <h3 style="text-align: center; margin-bottom: 30px;">No statistic booking</h3>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

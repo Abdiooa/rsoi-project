@@ -1,0 +1,56 @@
+version: "3"
+services:
+  gatewayservice:
+    image: abdiaoo/gatewayservice
+    build:
+      context: ./Gatewayservice
+    restart: always
+    ports:
+      - "8090:8090"
+    volumes:
+      - .:/app/Gatewayservice
+  paymentservice:
+    image: abdiaoo/paymentservice
+    build:
+      context: ./PaymentService
+    restart: always
+    ports:
+      - "8060:8060"
+    volumes:
+      - .:/app/PaymentService
+  loyaltyservice:
+    image: abdiaoo/loyaltyservice
+    build:
+      context: ./LoyaltyService
+    restart: always
+    ports:
+      - "8050:8050"
+    volumes:
+      - .:/app/LoyaltyService
+  reservationservice:
+    image: abdiaoo/reservationservice
+    build:
+      context: ./ReservationService
+    restart: always
+    ports:
+      - "8070:8070"
+    volumes:
+      - .:/app/ReservationService
+  sessionservice:
+    image: abdiaoo/sessionservice
+    build:
+      context: ./Session_Service
+    restart: always
+    ports:
+      - "8040:8040"
+    volumes:
+      - .:/app/Session_Service
+  reportservice:
+    image: abdiaoo/reportservice
+    build:
+      context: ./Report_Service
+    restart: always
+    ports:
+      - "8030:8030"
+    volumes:
+      - .:/app/Report_Service

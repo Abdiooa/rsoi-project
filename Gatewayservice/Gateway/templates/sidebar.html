@@ -1,0 +1,31 @@
+{% block sidebar %}
+<div class="card my-4 p-3">
+    <div class="card-body">
+        <h5 class="card-title">My bookings</h5>
+        <a href="{% url 'balance' %}" class="btn btn-info btn-block mb-3">View my bookings</a>
+        <h5 class="card-title">Find a hotel</h5>
+        <select class="form-select mb-3" id="selecttheme">
+            <option value="" selected>Choose a Country</option>
+            {% for city in cities %}
+                <option value="{{ city.city }}">{{ city.city }}</option>
+            {% endfor %}
+        </select>
+        <form action="{% url 'search' %}" method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="city" class="form-label" style="display:none;">Country</label>
+                <input type="text" name="city" id="city" class="form-control" value="" style="display: none"/>
+            </div>
+            <div class="mb-3">
+                <label for="startDate" class="form-label">Arrival Date</label>
+                <input type="date" name="startDate" id="startDate" class="form-control" required/>
+            </div>
+            <div class="mb-3">
+                <label for="endDate" class="form-label">Departure date</label>
+                <input type="date" name="endDate" id="endDate" class="form-control" required/>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Search</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

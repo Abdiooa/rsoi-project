@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Admin Dashboard
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="my-4">
+            <h3 class="text-center text-wrap text-break font-weight-bold">Welcome Admins</h3>
+        </div>
+        <div>
+            <div class="three-col-grid" style="padding-bottom: 550px;">
+                <div class="grid-item text-center">
+                    <a href="{% url 'add_hotel' %}" role="button" class="btn btn-outline-success btn-lg" style="width: 220px;">Add Hotel</a>
+                </div>
+                <div class="grid-item text-center">
+                    <a href="{% url 'delete_hotel' %}" role="button" class="btn btn-outline-danger btn-lg" style="width: 220px;">Delete Hotel</a>
+                </div>
+                <div class="grid-item text-center">
+                    <a href="{% url 'all_users' %}" role="button" class="btn btn-outline-primary btn-lg" style="width: 220px;">All Users</a>
+                </div>
+                <div class="grid-item text-center">
+                    <a href="{% url 'static_booking' %}" role="button" class="btn btn-outline-secondary btn-lg" style="width: 220px;">Statistic booking users</a>
+                </div>
+                <div class="grid-item text-center">
+                    <a href="{% url 'users_static' %}" role="button" class="btn btn-outline-secondary btn-lg" style="width: 220px;">Statistic login users</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

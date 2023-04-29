@@ -1,0 +1,82 @@
+{% extends 'autre.html' %}
+{% load static %}
+
+{% block hotel_image %}
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto col-md-8 mt-3">
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        <input type="button" class="btn btn-info" onclick="history.back();" value="Back"/>
+    {% else %}
+        <div class="p-1 my-1">
+            <h4 class="text-center text-wrap text-break font-weight-bold pb-4">{{ hotel_info.name }}</h4>
+        </div>
+        <div class="alert alert-light font">
+            <div class="row">
+                <div class="col-12">
+                    <table class="table">
+                        <tr>
+                            <th class="w-25 border-none">Country:</th>
+                            <td class="text-wrap border-none">{{ hotel_info.country }}</td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">City:</th>
+                            <td>{{ hotel_info.city }}</td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">Address:</th>
+                            <td>{{ hotel_info.address }}</td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">Stars:</th>
+                            <td>{{ hotel_info.stars }}</td>
+                        </tr>
+                        <tr>
+                            <th class="w-25">Price:</th>
+                            <td>{{ hotel_info.price }}</td>
+                        </tr>
+                    </table>
+                    {% if request.COOKIES.jwt %}
+                        <button class="btn btn-outline-secondary" id="example_2_2" style="display:none;"
+                            onclick="document.getElementById('example_2').style.display='none';
+                                    document.getElementById('example_2_2').style.display='none';
+                                    document.getElementById('example_2_1').style.display='block';">Cancel</button>
+                        <button class="btn btn-outline-primary" id="example_2_1"
+                            onclick="document.getElementById('example_2').style.display='block';
+                                    document.getElementById('example_2_1').style.display='none';
+                                    document.getElementById('example_2_2').style.display='block';">Reserve</button>
+                    {% else %}
+                        <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'signup' %}">register</a> to reserve the room!</p>
+                    {% endif %}
+                </div>  
+            </div>
+            {% if request.COOKIES.jwt %}
+                <div id="example_2" style="display:none;">
+                    <form action="{% url 'add_booking' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="hotel_uid" value="{{ hotel_info.hotelUid }}">
+                        <input type="hidden" name="hotel_name" value="{{ hotel_info.name }}"><br>
+                        <label>Arrival date</label>
+                        <input type="date" name="startDate" id="startDate" class="form-control" required><br>
+                        <label>Departure date</label>
+                        <input type="date" name="endDate" id="endDate" class="form-control" required><br>
+                        <input type="hidden" name="price" value="{{ hotel_info.price }}"><br>
+                        <input type="submit" class="btn btn-primary" value="Reserve">
+                    </form>
+                </div>
+                {% if dateerror %}
+                    <br>
+                    <div class="alert alert-danger">{{ dateerror }}</div>
+                {% endif %}
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

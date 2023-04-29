@@ -1,0 +1,125 @@
+{% extends "autre.html" %}
+{% load static %}
+
+{% block title %}
+    Personal account
+{% endblock %}
+{% block content %}
+    {% if usererror %}
+        <div class="alert alert-danger">{{ usererror }}</div>
+        <input type="button" class="btn btn-outline-secondary" onclick="history.back();" value="Back"/>
+    {% else %}
+        <div class="mx-auto col-md-8 mt-3">
+            <div class="p-1 my-1">
+                <h3 style="text-align: center; margin-bottom: 6px;">Shareton <b>ID</b></h3>
+            </div>
+            <table class="table" style="border-color: white;">
+                <tbody class="font">
+                <tr>
+                    <td style="border-color: #efeeee;">
+                        <div style="margin: 10px;">
+                            <h3 style="margin-bottom: 20px;">{{ user.last_name }} {{ user.name }}</h3>
+                            <h6><b>E-mail:</b></h6>
+                            <h6><b>Status:</b></h6>
+                            <h6><b>Level discount:</b></h6>
+                            <h6><b>Balance:</b></h6>
+                        </div>
+
+                    <td style="border-color: #efeeee;">
+                    <div style="margin-top: 64px;">
+                        <h6>{{ user.email }}</h6>
+                        <h6>{{ loyalty.status }}</h6>
+                        <h6>{{ loyalty.discount }}</h6>
+                        <h6>{{ loyalty.balance }}</h6>
+                    </div>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+            <div class="text-center">
+                <h3 style="font-weight: bold">My reservations</h3>
+            </div>
+            <div class="btn-group btn-block px-1">
+                <button id="example_2_2" onclick="document.getElementById('example_2').style.display='block';
+                                                document.getElementById('example_4').style.display='none';
+                                                document.getElementById('example_2_2').className='btn btn-outline-secondary active';
+                                                document.getElementById('example_4_4').className='btn btn-outline-secondary';"
+                                                class="btn btn-outline-secondary active">Valid reservations</button>
+                <button id="example_4_4" onclick="document.getElementById('example_2').style.display='none';
+                                                document.getElementById('example_4').style.display='block';
+                                                document.getElementById('example_4_4').className='btn btn-outline-secondary active';
+                                                document.getElementById('example_2_2').className='btn btn-outline-secondary';"
+                                                class="btn btn-outline-secondary">History reservations</button>
+            </div>
+            <div id="example_2" style="display: block">
+            <hr>
+                {% for book, hotel, pay in currbookhot %}
+                    {% if pay.status == "NEW" %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.reservationUid %}><h3>Hotel's reservations {{ hotel.name }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.startDate }} - {{ book.endDate }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Address: {{ hotel.address }}</p>
+                                <p style="font-weight: bold">Payment required</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Country {{ hotel.country }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.reservationUid %}><h3>Hotel's reservations {{ hotel.name }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.startDate }} - {{ book.endDate }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Address: {{ hotel.address }}</p>
+                                <p style="font-weight: bold">Paid</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Country {{ hotel.country }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div id="example_4" style="display: none">
+            <hr>
+                {% for book, hotel, pay in histbookhot %}
+                    {% if pay.status == "CANCELED" %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.reservationUid %}><h3>Hotel's reservations {{ hotel.name }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.startDate }} - {{ book.endDate }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Address: {{ hotel.address }}</p>
+                                <p style="font-weight: bold">Canceled</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Country {{ hotel.country }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class = "font my-4 p-2">
+                        <a href={% url 'booking_info' book.reservationUid %}><h3>Hotel's reservations {{ hotel.name }}</h3></a>
+                        <p class="d-inline-block text-truncate" style="max-width:800px;">{{ book.startDate }} - {{ book.endDate }}</p>
+                        <div class="row">
+                            <div class="col-8">
+                                <p>Address: {{ hotel.address }}</p>
+                                <p style="font-weight: bold">Funds reversed</p>
+                            </div>
+                            <div class="col-4">
+                                <p>Country {{ hotel.country }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
