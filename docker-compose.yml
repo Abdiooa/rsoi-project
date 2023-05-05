@@ -6,7 +6,7 @@ services:
       context: ./Gatewayservice
     restart: always
     ports:
-      - "8090:8090"
+      - "8080:8080"
     volumes:
       - .:/app/Gatewayservice
   paymentservice:

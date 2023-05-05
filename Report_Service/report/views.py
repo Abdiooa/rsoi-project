@@ -20,15 +20,15 @@ import time
 import jwt
 from Report_Service.settings import JWT_KEY
 import sys
+import random
+import string
 
 conf = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': '157.230.71.224:9092,146.190.188.54:9092', 
     'session.timeout.ms': 6000,
     'group.id': 'dmqj25d74voir-consumer',
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
-
-
 
 @api_view(['GET'])
 def report_by_users(request):
@@ -115,7 +115,7 @@ def consumer(topic):
 def report_by_hotels(request):
     try:
         auth(request)
-        hotels = requests.get("https://localhost:8070/api/v1/reservations/static", cookies=request.COOKIES)
+        hotels = requests.get("https://reservationsvc:8070/api/v1/reservations/static", cookies=request.COOKIES)
         if hotels.status_code == 200:
             hotels = hotels.content.decode('utf8').replace("'", '"')
             hotels = json.loads(hotels)

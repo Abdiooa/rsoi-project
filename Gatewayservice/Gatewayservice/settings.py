@@ -82,9 +82,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER':'postgres',
-        'PASSWORD':'Abdi2000*',
-        'HOST':'localhost',
+        'USER':'program',
+        'PASSWORD':'test',
+        'HOST':'postgres',
         'PORT': 5432
     }
 }
@@ -94,7 +94,16 @@ DATABASES = {
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER':'postgres',
+#         'PASSWORD':'Abdi2000*',
+#         'HOST':'localhost',
+#         'PORT': 5432
+#     }
+# }
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

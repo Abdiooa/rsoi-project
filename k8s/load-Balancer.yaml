@@ -8,6 +8,6 @@ spec:
   type: LoadBalancer  
   ports:
     - protocol: TCP
-      port: 8040
-      targetPort: 8040
+      port: 8090
+      targetPort: 8090
       nodePort: 30000

@@ -10,5 +10,5 @@ RUN pip install -r requirements.txt
 
 COPY . /app/LoyaltyService
 
-CMD ["sh", "-c", " /usr/local/bin/python LoyaltyService/manage.py makemigrations && /usr/local/bin/python LoyaltyService/manage.py migrate && /usr/local/bin/python LoyaltyService/manage.py runserver 0.0.0.0:8050"]
+CMD ["sh", "-c", " /usr/local/bin/python manage.py makemigrations && /usr/local/bin/python manage.py migrate && /usr/local/bin/python manage.py runserver 0.0.0.0:8050"]
 

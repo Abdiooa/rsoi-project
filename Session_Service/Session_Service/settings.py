@@ -25,7 +25,7 @@ JWT_KEY = "django-insecure-8h7v$dffhmb3w^u+qz#v=x%jmpu%=16%c1q-vik%p2wllwt9bh"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -77,17 +77,26 @@ WSGI_APPLICATION = 'Session_Service.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'session',
+#         'USER':'postgres',
+#         'PASSWORD':'Abdi2000*',
+#         'HOST':'localhost',
+#         'PORT': 5432
+#     }
+# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'session',
-        'USER':'postgres',
-        'PASSWORD':'Abdi2000*',
-        'HOST':'localhost',
+        'USER':'program',
+        'PASSWORD':'test',
+        'HOST':'postgres',
         'PORT': 5432
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

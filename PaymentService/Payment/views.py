@@ -24,13 +24,12 @@ def Payments(request):
 
 @api_view(['POST'])
 def payer(request,paymentUid):
-    print("entrer")
     try:
         auth(request)
         payment = Payment.objects.get(paymentUid=paymentUid)
         payment.status = "PAID"
         print(payment.status)
-        pay_loyalty = requests.patch("http://loyalty:8050/api/v1/loyalty/edit_balance",
+        pay_loyalty = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit_balance",
                                     json={'status': payment.status, 'price': request.data['price']},
                                     cookies=request.COOKIES)
         if pay_loyalty.status_code != 200:
@@ -45,7 +44,7 @@ def payer(request,paymentUid):
 def createPayment(request):
     try:
         data = auth(request)
-        loyBalance = requests.get("http://loyalty:8050/api/v1/loyalty/balance", cookies=request.COOKIES)
+        loyBalance = requests.get("http://loyaltysvc:8050/api/v1/loyalty/balance", cookies=request.COOKIES)
         if loyBalance.status_code != 200:
             return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
         loyBalance = loyBalance.json()
@@ -79,7 +78,7 @@ def reversed(request, paymentUid):
         print("entrerr")
         print(payment.status)
         print(request.data['price'])
-        pay_loyalty = requests.patch("http://localhost:8050/api/v1/loyalty/edit_balance",
+        pay_loyalty = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit_balance",
                                     json={'status': payment.status, 'price': request.data['price']},
                                     cookies=request.COOKIES)
         if pay_loyalty.status_code != 200:

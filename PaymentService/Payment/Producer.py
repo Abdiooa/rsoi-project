@@ -7,10 +7,13 @@ if __name__ == '__main__':
     topic = 'payment-statistic'
     
     conf = {
-    'bootstrap.servers': 'localhost:9092',
-    'session.timeout.ms': 6000,
-    'default.topic.config': {'auto.offset.reset': 'smallest'}
+        'bootstrap.servers': '157.230.71.224:9092,146.190.188.54:9092', 
+        'session.timeout.ms': 6000,
+        'group.id': 'dmqj25d74voir-consumer',
+        'default.topic.config': {'auto.offset.reset': 'smallest'}
     }
+
+
     
     p = Producer(**conf)
     

@@ -32,44 +32,11 @@ from datetime import datetime as dt
 tz_MOS = pytz.timezone('Europe/Moscow')
 
 conf = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': '157.230.71.224:9092,146.190.188.54:9092', 
     'session.timeout.ms': 6000,
+    'group.id': 'dmqj25d74voir-consumer',
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
-def search_hotel_booking(request):
-    is_authenticated, request, session = cookies(request)
-    user = auth(request)
-    cities = requests.get("http://localhost:8070/api/v1/cities").json()
-    if request.method == 'POST':
-        data = request.POST
-        if datetime.datetime.strptime(request.POST['startDate'], "%Y-%m-%d") > datetime.datetime.strptime(
-                request.POST['endDate'], "%Y-%m-%d") or \
-                datetime.datetime.strptime(request.POST['startDate'], "%Y-%m-%d") < datetime.datetime.now():
-            title = "Invalid Date Entry!"
-            response = render(request, 'index.html', {'title': title, 'cities': cities, 'user': user})
-        else:
-            search = requests.post("http://localhost:8070/api/v1/hotel/date",
-                                json={"startDate": data["startDate"],
-                                        "endDate": data["endDate"],
-                                        "city": data["city"]}, cookies=request.COOKIES)
-            print(search.json())
-            if len(search.json()) != 0:
-                title = "Available hotels in the city " + str(data["city"]) + " from " + str(
-                    data["startDate"]) + " to " + str(data["endDate"])
-
-                paginator = Paginator(search.json(), 10)
-                page_number = request.GET.get('page')
-                page_obj = paginator.get_page(page_number)
-                response = render(request, 'index.html', {'allhotels': search, 'page_obj': page_obj, \
-                                                        'cities': cities, 'title': title, 'user': user})
-            else:
-                title = "No results were found for your search."
-                response = render(request, 'index.html', {'title': title, 'cities': cities, 'user': user})
-        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
-            if is_authenticated else response.delete_cookie('jwt')
-        return response
-
-
 
 def users_static(request):
     is_authenticated, request, session = cookies(request)
@@ -79,7 +46,7 @@ def users_static(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     try:
-        static_users = requests.get("http://localhost:8030/api/v1/reports/users", cookies=request.COOKIES).json()
+        static_users = requests.get("http://reportssvc:8030/api/v1/reports/users", cookies=request.COOKIES).json()
         dictlist = list()
         for key, value in static_users.items():
             temp = [key, value]
@@ -97,42 +64,42 @@ def pay_room(request, paymentUid):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
     if request.method == 'POST':
-        booking = requests.get("http://localhost:8070/api/v1/reservations/{}"
+        booking = requests.get("http://reservationsvc:8070/api/v1/reservations/{}"
                             .format(request.POST['reservationUid']), cookies=session.cookies).json()
-        hotel = requests.get("http://localhost:8070/api/v1/hotel/{}"
+        hotel = requests.get("http://reservationsvc:8070/api/v1/hotel/{}"
                             .format(booking['hotel_uid']), cookies=session.cookies).json()
-        payment = requests.get("http://localhost:8060/api/v1/payment/{}"
+        payment = requests.get("http://paymentsvc:8060/api/v1/payment/{}"
                             .format(booking['paymentUid']), cookies=session.cookies).json()
         
         date_start = datetime.datetime.strptime(booking['startDate'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['endDate'], "%Y-%m-%d")
         period = date_end - date_start
         totalcost = int(hotel['price']) * (period.days)
-        pay = requests.post("http://localhost:8060/api/v1/payment/pay/{}"
+        pay = requests.post("http://paymentsvc:8060/api/v1/payment/pay/{}"
                             .format(paymentUid), json={'price': totalcost}, cookies=request.COOKIES)
         
         if pay.status_code == 200:
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['reservationUid']))
-            booking_all = requests.get("http://localhost:8070/api/v1/reservations", cookies=session.cookies)
+            booking_all = requests.get("http://reservationsvc:8070/api/v1/reservations", cookies=session.cookies)
             if booking_all.status_code != 200:
                 return JsonResponse(booking_all.json(), status=status.HTTP_400_BAD_REQUEST)
             len_booking = booking_all.json()
-            l_status = requests.get("http://localhost:8050/api/v1/loyalty/balance", cookies=session.cookies)
+            l_status = requests.get("http://loyaltysvc:8050/api/v1/loyalty/balance", cookies=session.cookies)
             if l_status.status_code != 200:
                 return JsonResponse(l_status.json(), status=status.HTTP_400_BAD_REQUEST)
             l_status = l_status.json()['status']
             if 1 < len(len_booking) < 35 and l_status == 'None':  # BRONZE
-                loyaltyUP = requests.patch("http://localhost:8050/api/v1/loyalty/edit", json={"active": "UP"},
+                loyaltyUP = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit", json={"active": "UP"},
                                         cookies=session.cookies)
                 if loyaltyUP.status_code != 200:
                     return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
             elif 35 < len(len_booking) < 50 and l_status == 'BRONZE':  # SILVER
-                loyaltyUP = requests.patch("http://localhost:8050/api/v1/loyalty/edit", json={"active": "UP"},
+                loyaltyUP = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit", json={"active": "UP"},
                                         cookies=session.cookies)
                 if loyaltyUP.status_code != 200:
                     return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
             elif 50 < len(len_booking) and l_status == 'SILVER':  # GOLD
-                loyaltyUP = requests.patch("http://localhost:8050/api/v1/loyalty/edit", json={"active": "UP"},
+                loyaltyUP = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit", json={"active": "UP"},
                                         cookies=session.cookies)
                 if loyaltyUP.status_code != 200:
                     return JsonResponse(loyaltyUP.json(), status=status.HTTP_400_BAD_REQUEST)
@@ -158,7 +125,7 @@ async def del_booking(request, reservationUid):
         hot = ast.literal_eval(request.POST['hotel'])
         pay = ast.literal_eval(request.POST['payment'])
         if request.POST['status'] == "NEW":
-            delbook = requests.delete("http://localhost:8070/api/v1/reservations/canceled/{}"
+            delbook = requests.delete("http://reservationsvc:8070/api/v1/reservations/canceled/{}"
                                     .format(reservationUid), cookies=request.COOKIES)
             if delbook.status_code == 200:
                 success = "Booking deleted"
@@ -168,18 +135,18 @@ async def del_booking(request, reservationUid):
                 response = render(request, 'user_booking.html', {'booking': book, 'hotel': hot,
                                                                 'payment': pay, 'error': error, 'user': data})
         else:
-            booking = requests.get("http://localhost:8070/api/v1/reservations/{}"
+            booking = requests.get("http://reservationsvc:8070/api/v1/reservations/{}"
                             .format(reservationUid), cookies=session.cookies).json()
-            hotel = requests.get("http://localhost:8070/api/v1/hotel/{}"
+            hotel = requests.get("http://reservationsvc:8070/api/v1/hotel/{}"
                             .format(booking['hotel_uid']), cookies=session.cookies).json()
             date_start = datetime.datetime.strptime(booking['startDate'], "%Y-%m-%d")
             date_end = datetime.datetime.strptime(booking['endDate'], "%Y-%m-%d")
             period = date_end - date_start
             totalcost = int(hotel['price']) * (period.days)
-            payment = requests.post("http://localhost:8060/api/v1/payment/reversed/{}"
+            payment = requests.post("http://paymentsvc:8060/api/v1/payment/reversed/{}"
                                     .format(booking['paymentUid']), json={'price': totalcost}, cookies=request.COOKIES)
             if payment.status_code == 200:
-                delbook = requests.delete("http://localhost:8070/api/v1/reservations/canceled/{}"
+                delbook = requests.delete("http://reservationsvc:8070/api/v1/reservations/canceled/{}"
                                         .format(reservationUid), cookies=request.COOKIES)
                 if delbook.status_code == 200:
                     success = "Booking deleted"
@@ -205,9 +172,9 @@ async def add_booking(request):
         startDate = datetime.datetime.strptime(request.POST['startDate'], "%Y-%m-%d")
         endDate = datetime.datetime.strptime(request.POST['endDate'], "%Y-%m-%d")
         async with aiohttp.ClientSession(cookies=request.COOKIES) as client_session:
-            hotel_task = client_session.get("http://localhost:8070/api/v1/hotel/{}"
+            hotel_task = client_session.get("http://reservationsvc:8070/api/v1/hotel/{}"
                         .format(request.POST['hotel_uid']))
-            user_loyalty_task = client_session.get(f"http://localhost:8050/api/v1/loyalty/status/{user['username']}")
+            user_loyalty_task = client_session.get(f"http://loyaltysvc:8050/api/v1/loyalty/status/{user['username']}")
             hotel_response,userloyalty_res = await asyncio.gather(hotel_task,user_loyalty_task)
             hotel = await hotel_response.json()
             user_loyalty = await userloyalty_res.json()
@@ -217,7 +184,7 @@ async def add_booking(request):
                                                     'user': user})
         else:
             async with aiohttp.ClientSession(cookies=request.COOKIES) as client_session:
-                booking_response = await client_session.post("http://localhost:8070/api/v1/reservations",
+                booking_response = await client_session.post("http://reservationsvc:8070/api/v1/reservations",
                                     json={"hotel_uid": data["hotel_uid"],
                                         "startDate": data["startDate"],
                                         "endDate": data["endDate"],
@@ -225,7 +192,7 @@ async def add_booking(request):
                                         "price": int(data["price"])})
                 booking = await booking_response.json()
                 if booking_response.status == 200:
-                    payment_response = await client_session.get(f"http://localhost:8060/api/v1/payment/{booking['paymentUid']}")
+                    payment_response = await client_session.get(f"http://paymentsvc:8060/api/v1/payment/{booking['paymentUid']}")
                     payment = await payment_response.json()
                     q_booking = {"reservationUid":booking['reservationUid'],"hotel_uid":booking['hotel_uid'],"user_uid":user['user_uid'],"paymentUid":booking['paymentUid'],"startDate":booking["startDate"],"endDate":booking['endDate'],"status":booking['status'],"price":payment['price'],"name":hotel['name'],"country":hotel['country'],"city":hotel['city'],"address":hotel['address'],"username":user['username'],'email':user['email'],"status_loyalty":user_loyalty['status'],"discount":user_loyalty['discount']}
                     producer(q_booking, 'payment-statistic')
@@ -242,8 +209,8 @@ async def index(request):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
     async with aiohttp.ClientSession() as client_session:
-        cities_task =  client_session.get("http://localhost:8070/api/v1/cities")
-        _allhotels_task = client_session.get("http://localhost:8070/api/v1/hotels", cookies=request.COOKIES)
+        cities_task =  client_session.get("http://reservationsvc:8070/api/v1/cities")
+        _allhotels_task = client_session.get("http://reservationsvc:8070/api/v1/hotels", cookies=request.COOKIES)
         cities,_allhotels = await asyncio.gather(cities_task,_allhotels_task)
         cities = await cities.json()
         _allhotels = await _allhotels.json()
@@ -266,9 +233,9 @@ async def balance(request):
     data = auth(request)
     try:
         async with aiohttp.ClientSession(cookies=request.COOKIES) as client_session:
-            loyalty_task = client_session.get(f"http://localhost:8050/api/v1/loyalty/status/{data['username']}")
-            user_task = client_session.get(f"http://localhost:8040/api/v1/session/user/{data['user_uid']}")
-            _allbook_task = client_session.get("http://localhost:8070/api/v1/reservations")
+            loyalty_task = client_session.get(f"http://loyaltysvc:8050/api/v1/loyalty/status/{data['username']}")
+            user_task = client_session.get(f"http://sessionsvc:8040/api/v1/session/user/{data['user_uid']}")
+            _allbook_task = client_session.get("http://reservationsvc:8070/api/v1/reservations")
 
             loyalty_res, user_res, _allbook_res = await asyncio.gather(loyalty_task, user_task, _allbook_task)
 
@@ -283,8 +250,8 @@ async def balance(request):
             hotels_task = []
             
             for s in sort:
-                payment_task = client_session.get(f"http://localhost:8060/api/v1/payment/{s['paymentUid']}")
-                hotel_task = client_session.get(f"http://localhost:8070/api/v1/hotel/{s['hotel_uid']}")
+                payment_task = client_session.get(f"http://paymentsvc:8060/api/v1/payment/{s['paymentUid']}")
+                hotel_task = client_session.get(f"http://reservationsvc:8070/api/v1/hotel/{s['hotel_uid']}")
                 payment_tasks.append(payment_task)
                 hotels_task.append(hotel_task)
             
@@ -332,7 +299,7 @@ async def all_users(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     async with aiohttp.ClientSession() as client_session:
-        async with client_session.get("http://localhost:8040/api/v1/session/users", cookies=request.COOKIES) as _users_res:
+        async with client_session.get("http://sessionsvc:8040/api/v1/session/users", cookies=request.COOKIES) as _users_res:
             _users = await _users_res.json()
     response = render(request, 'all_users.html', {'all_users': _users, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
@@ -341,7 +308,7 @@ async def all_users(request):
     return response
 
 def cities(request):
-    dict_cities = requests.get("http://localhost:8070/api/v1/cities")
+    dict_cities = requests.get("http://reservationsvc:8070/api/v1/cities")
     if dict_cities.status_code == 200:
         dict_cities = dict_cities.json()
         return JsonResponse(dict_cities, status=status.HTTP_200_OK, safe=False)
@@ -370,7 +337,7 @@ def delete_hotel_admin(request):
         form = DeleteHotel()
     if request.method == "POST":
         form = DeleteHotel(data=request.POST)
-        new_hotel = requests.delete('http://localhost:8070/api/v1/hotel/{}'.format(form.data['hotelUid']),
+        new_hotel = requests.delete('http://reservationsvc:8070/api/v1/hotel/{}'.format(form.data['hotelUid']),
                                     cookies=request.COOKIES)
         error = 'success'
         if new_hotel.status_code != 204:
@@ -396,8 +363,8 @@ async def fetch(url,cookies=None):
 async def hotel_info(request,hotelUid):
     is_authenticated, request, session = cookies(request)
     data = auth(request)
-    cities_task = fetch("http://localhost:8070/api/v1/cities")
-    hotel_task = fetch("http://localhost:8070/api/v1/hotel/{}".format(hotelUid), cookies=request.COOKIES)
+    cities_task = fetch("http://reservationsvc:8070/api/v1/cities")
+    hotel_task = fetch("http://reservationsvc:8070/api/v1/hotel/{}".format(hotelUid), cookies=request.COOKIES)
     try:
         cities,hotel = await asyncio.gather(cities_task,hotel_task)
         error = None
@@ -424,7 +391,7 @@ async def registration(request):
             data = {"username": form.data['username'], "name": form.data['first_name'],
                     "last_name": form.data['last_name'], "password": form.data['password'],
                     "email": form.data['email']}
-            async with session.post('http://localhost:8040/api/v1/session/register', json=data) as response:
+            async with session.post('http://sessionsvc:8040/api/v1/session/register', json=data) as response:
                 requete = await response.json()
                 error = 'success'
                 if response.status != 200:
@@ -435,7 +402,7 @@ async def registration(request):
             q_session = {"username": requete["username"], "detail": 'Register',
                 "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')}
             producer(q_session, 'users-statistic')
-            async with session.post("http://localhost:8050/api/v1/loyalty/create", json=datat) as response:
+            async with session.post("http://loyaltysvc:8050/api/v1/loyalty/create", json=datat) as response:
                 if response.status != 200:
                     return JsonResponse(await response.json(), status=status.HTTP_400_BAD_REQUEST)
         return HttpResponseRedirect('/login')
@@ -443,7 +410,7 @@ async def registration(request):
 
 async def make_logout(request):
     async with aiohttp.ClientSession() as client_session:
-        async with client_session.post("http://localhost:8040/api/v1/session/logout", cookies=request.COOKIES) as res:
+        async with client_session.post("http://sessionsvc:8040/api/v1/session/logout", cookies=request.COOKIES) as res:
             data = await res.json()
     if res.status == 200:
         q_session = {"username": data["username"], "detail": 'Logout',
@@ -461,7 +428,7 @@ def static_booking(request):
         response = HttpResponseRedirect('/index')
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
-    report = requests.get("http://localhost:8030/api/v1/reports/booking", cookies=session.cookies)
+    report = requests.get("http://reportssvc:8030/api/v1/reports/booking", cookies=session.cookies)
     if report.status_code == 200:
         report = report.content.decode('utf8').replace("'", '"')
         report = json.loads(report)
@@ -478,29 +445,27 @@ def static_booking(request):
     return response
 
 
-async def make_login(request):
+def make_login(request):
     error = None
     if request.method == "GET":
         form = LoginForm()
     if request.method == "POST":
         form = LoginForm(data=request.POST)
-        async with aiohttp.ClientSession() as client_session:
-            async with client_session.post('http://localhost:8040/api/v1/session/login',
+        session = requests.post('http://sessionsvc:8040/api/v1/session/login',
                                 json={"username": request.POST.get('username'),
-                                    "password": request.POST.get('password')}) as res:
-                data = await res.json()
-        if res.status == 200:
-            q_session = data
+                                    "password": request.POST.get('password')})
+        if session.status_code == 200:
+            q_session = session.json()
             q_session.update({"username": request.POST["username"],
                     "date": dt.now(tz_MOS).strftime('%Y-%m-%d %H:%M:%S %Z%z')})
             producer(q_session, 'users-statistic')
             response = HttpResponseRedirect('/index')
-            response.set_cookie(key='jwt', value=res.cookies.get('jwt'), httponly=True)
+            response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
             return response
         else:
             session = session.content.decode('utf8').replace("'", '"')
             error = json.loads(session)['detail']
-    return render(request, 'login.html', {'form': form, 'error': error})
+    return render(request, 'login.html', {'form': form, 'error': error, 'cities': cities})
 
 
 async def add_hotel_admin(request):
@@ -514,7 +479,7 @@ async def add_hotel_admin(request):
         form = NewHotel(data=request.POST)
         error = 'success'
         async with aiohttp.ClientSession() as client_session:
-            async with client_session.post("http://localhost:8070/api/v1/hotels",
+            async with client_session.post("http://reservationsvc:8070/api/v1/hotels",
                                 json={'name': form.data['name'], 'country': form.data['country'],
                                         'stars': form.data['stars'], 'price': form.data['price'],
                                         'city': form.data['city'],
@@ -535,8 +500,8 @@ async def booking_info(request,reservationUid):
     data = auth(request)
     try:
         async with aiohttp.ClientSession(cookies=request.COOKIES) as client_session:
-            cities_task = client_session.get("http://localhost:8070/api/v1/cities")
-            booking_task = client_session.get("http://localhost:8070/api/v1/reservations/{}"
+            cities_task = client_session.get("http://reservationsvc:8070/api/v1/cities")
+            booking_task = client_session.get("http://reservationsvc:8070/api/v1/reservations/{}"
                             .format(reservationUid))
             
             cities_res, booking_res = await asyncio.gather(cities_task,booking_task)
@@ -544,9 +509,9 @@ async def booking_info(request,reservationUid):
             cities = await cities_res.json()
             booking = await booking_res.json()
             
-            hotel_task = client_session.get("http://localhost:8070/api/v1/hotel/{}"
+            hotel_task = client_session.get("http://reservationsvc:8070/api/v1/hotel/{}"
                             .format(booking['hotel_uid']))
-            payment_task = client_session.get("http://localhost:8060/api/v1/payment/{}"
+            payment_task = client_session.get("http://paymentsvc:8060/api/v1/payment/{}"
                             .format(booking['paymentUid']))
             
             hotel_res, payment_res = await asyncio.gather(hotel_task,payment_task)
@@ -607,10 +572,10 @@ def auth(request):
 
 def cookies(request):
     is_authenticated = False
-    session = requests.get("http://localhost:8040/api/v1/session/validate",cookies=request.COOKIES)
+    session = requests.get("http://sessionsvc:8040/api/v1/session/validate",cookies=request.COOKIES)
     if session.status_code != 200:
         if session.status_code == 403:
-            session = requests.get("http://localhost:8040/api/v1/session/refresh", cookies=request.COOKIES)
+            session = requests.get("http://sessionsvc:8040/api/v1/session/refresh", cookies=request.COOKIES)
             is_authenticated = True
         elif session.status_code != 401:
             pass

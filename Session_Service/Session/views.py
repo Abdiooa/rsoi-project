@@ -49,8 +49,9 @@ def login(request):
         'username': str(username),
         'role': str(user.role),
         'email': str(user.email),
+        "scope" : 'openid profile email',
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-        'iat': datetime.datetime.utcnow()
+        'iat': datetime.datetime.utcnow(),
     }
     
     token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
@@ -98,9 +99,10 @@ def verify(request):
     
     if token is None:
         return JsonResponse({'detail': 'Null token'}, status=status.HTTP_401_UNAUTHORIZED)
-    
     try:
         jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        # if 'openid' not in decoded_token['scope'] or 'profile' not in decoded_token['scope'] or 'email' not in decoded_token['scope']:
+        #     raise AuthenticationFailed('Missing scope')
     except jwt.ExpiredSignatureError:
         raise AuthenticationFailed('Unauthenticated!')
     except jwt.DecodeError:

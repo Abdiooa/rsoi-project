@@ -9,7 +9,6 @@ urlpatterns = [
     path('balance', balance, name="balance"),
     path('admin', admin, name="admin"),
     path('hotel_info/<str:hotelUid>/', hotel_info, name="hotel_info"),
-    path('search/', search_hotel_booking, name="search"),
     path('admin', admin, name="admin"),
     path('add-hotel', add_hotel_admin, name="add_hotel"),
     path('delete-hotel', delete_hotel_admin, name="delete_hotel"),

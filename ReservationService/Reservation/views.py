@@ -54,7 +54,7 @@ def Hotels_or_addHotel(request):
 def filter_date(request):
     try:
         if "startDate" and "endDate" in request.data.keys():
-            filter_booking = requests.get("http://localhost:8070/api/v1/reservations/date/{}/{}".
+            filter_booking = requests.get("http://reservationsvc:8070/api/v1/reservations/date/{}/{}".
                                         format(request.data["startDate"], request.data["endDate"]),
                                         cookies=request.COOKIES)
             if filter_booking.status_code == 204:
@@ -128,25 +128,25 @@ def all_hotels_statics(request):
         reservations = json.loads(serializers.serialize('json', hotel_reservations))
         for res in reservations:
             payBalance = requests.get(
-                "http://localhost:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
+                "http://paymentsvc:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
                 cookies=request.COOKIES)
             if payBalance.status_code == 200:
                 payBalance = payBalance.json()
                 res['fields'].update(payBalance)
             about_hotel = requests.get(
-                "http://localhost:8070/api/v1/hotels/{}".format(res['fields'].get("hotel_id")),
+                "http://reservationsvc:8070/api/v1/hotels/{}".format(res['fields'].get("hotel_id")),
                 cookies=request.COOKIES)
             if about_hotel.status_code == 200:
                 about_hotel = about_hotel.json()
                 res['fields'].update(about_hotel)
             user = requests.get(
-                "http://localhost/api/v1/session/user_u/{}".format(res['fields'].get("username")),
+                "http://sessionsvc:8040/api/v1/session/user_u/{}".format(res['fields'].get("username")),
                 cookies=request.COOKIES)
             if user.status_code == 200:
                 user = user.json()
                 res['fields'].update(user)
             loyalty = requests.get(
-                "http://localhost:8050/api/v1/loyalty/status/{}".format(res['fields'].get("username")),
+                "http://loyaltysvc:8050/api/v1/loyalty/status/{}".format(res['fields'].get("username")),
                 cookies=request.COOKIES)
             if loyalty.status_code == 200:
                 loyalty = loyalty.json()
@@ -215,12 +215,12 @@ def create_or_all(request):
             date_end = datetime.datetime.strptime(request.data['endDate'], "%Y-%m-%d")
             period = date_end - date_start
             totalcost = int(request.data['price']) * (period.days)
-            payBalance = requests.post("http://localhost:8060/api/v1/payment/create",
+            payBalance = requests.post("http://paymentsvc:8060/api/v1/payment/create",
                                     json={"price": totalcost}, cookies=request.COOKIES)
             if payBalance.status_code != 200:
                 return JsonResponse({'error': 'Error in payment'}, status=status.HTTP_400_BAD_REQUEST)
             payBalance = payBalance.json()
-            loyBalanceedit = requests.patch("http://loyalty:8050/api/v1/loyalty/edit_balance",json={'status':payBalance["status"],'price':totalcost}, cookies=request.COOKIES)
+            loyBalanceedit = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit_balance",json={'status':payBalance["status"],'price':totalcost}, cookies=request.COOKIES)
             if loyBalanceedit.status_code != 200:
                 return JsonResponse({'error': 'Error in loyalty'}, status=status.HTTP_400_BAD_REQUEST)
             new_reservation = {"hotel_uid": request.data["hotel_uid"], "username": username,
@@ -235,13 +235,13 @@ def create_or_all(request):
             users_reservations = json.loads(serializers.serialize('json', reservations))
             for res in users_reservations:
                 payBalance = requests.get(
-                    "http://localhost:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
+                    "http://payementsvc:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
                     cookies=request.COOKIES)
                 if payBalance.status_code == 200:
                     payBalance = payBalance.json()
                     res['fields'].update(payBalance)
                 hotel = requests.get(
-                    "http://localhost:8070/api/v1/hotel/{}".format(res['fields'].get("hotel_uid")),
+                    "http://reservationsvc:8070/api/v1/hotel/{}".format(res['fields'].get("hotel_uid")),
                     cookies=request.COOKIES)
                 if hotel.status_code == 200:
                     hotel = hotel.json()
@@ -259,12 +259,12 @@ def about_one(request,reservationUid):
         auth(request)
         reservations = Reservation.objects.get(reservationUid=reservationUid)
         reservations = model_to_dict(reservations)
-        hotel = requests.get("http:localhost:8070/api/v1/hotel/{}".format(reservations["hotelUid"]),
+        hotel = requests.get("http://reservationsvc:8070/api/v1/hotel/{}".format(reservations["hotelUid"]),
                             cookies=request.COOKIES)
         if hotel.status_code == 200:
             hotel = hotel.json()
             reservations.update(hotel)
-        payBalance = requests.get("http://localhost:8060/api/v1/payment/{}".format(reservations["paymentUid"]),
+        payBalance = requests.get("http://paymentsvc:8060/api/v1/payment/{}".format(reservations["paymentUid"]),
                                 cookies=request.COOKIES)
         if payBalance.status_code == 200:
             payBalance = payBalance.json()
@@ -300,7 +300,7 @@ def pay(request,reservationUid):
     try:
         auth(request)
         payment_uid = Reservation.objects.get(reservationUid=reservationUid).paymentUid
-        payStatus = requests.post("http://localhost:8060/api/v1/payment/pay/{}".format(payment_uid),
+        payStatus = requests.post("http://paymentsvc:8060/api/v1/payment/pay/{}".format(payment_uid),
                                 cookies=request.COOKIES)
         if payStatus.status_code == 200:
             return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
@@ -318,23 +318,23 @@ def all_reservation_of_hotel(request,hotel_id):
         reservations = json.loads(serializers.serialize('json', hotel_reservations))
         for res in reservations:
             payBalance = requests.get(
-                "http://localhost:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
+                "http://paymentsvc:8060/api/v1/payment/{}".format(res['fields'].get("paymentUid")),
                 cookies=request.COOKIES)
             if payBalance.status_code == 200:
                 payBalance = payBalance.json()
                 res['fields'].update(payBalance)
             about_hotel = requests.get(
-                "http://localhost:8070/api/v1/hotels/{}".format(res['fields'].get("hotel_id")),cookies=request.COOKIES)
+                "http://reservationsvc:8070/api/v1/hotels/{}".format(res['fields'].get("hotel_id")),cookies=request.COOKIES)
             if about_hotel.status_code == 200:
                 about_hotel = about_hotel.json()
                 res['fields'].update(about_hotel)
             user = requests.get(
-                "http://localhost/api/v1/session/user_u/{}".format(res['fields'].get("username")),cookies=request.COOKIES)
+                "http://sessionsvc:8040/api/v1/session/user_u/{}".format(res['fields'].get("username")),cookies=request.COOKIES)
             if user.status_code == 200:
                 user = user.json()
                 res['fields'].update(user)
             loyalty = requests.get(
-                "http://localhost:8050/api/v1/loyalty/status/{}".format(res['fields'].get("username")),
+                "http://loyaltysvc:8050/api/v1/loyalty/status/{}".format(res['fields'].get("username")),
                 cookies=request.COOKIES)
             if loyalty.status_code == 200:
                 loyalty = loyalty.json()
@@ -352,7 +352,7 @@ def canceled(request,reservationUid):
         auth(request)
         print("entrerrrr")
         payment_uid = Reservation.objects.get(reservationUid=reservationUid).paymentUid
-        payStatus = requests.delete("http://localhost:8060/api/v1/payment/close/{}".format(payment_uid),
+        payStatus = requests.delete("http://paymentsvc:8060/api/v1/payment/close/{}".format(payment_uid),
                                     cookies=request.COOKIES)
         if payStatus.status_code == 200:
             return JsonResponse(payStatus.json(), status=status.HTTP_200_OK)
@@ -370,7 +370,7 @@ def filter_booking(request,startDate,endDate):
             return JsonResponse({'message': 'No content'}, status=status.HTTP_204_NO_CONTENT)
         for res in reservations:
             payBalance = requests.get(
-                "http:localhost:8060/api/v1/payment/{}".format(res["paymentUid"]),cookies=request.COOKIES)
+                "http://paymentsvc:8060/api/v1/payment/{}".format(res["paymentUid"]),cookies=request.COOKIES)
             if payBalance.status_code == 200:
                 payBalance = payBalance.json()
                 if payBalance["status"] == "CANCELED":
@@ -379,6 +379,7 @@ def filter_booking(request,startDate,endDate):
         return JsonResponse(mylist, status=status.HTTP_200_OK, safe=False)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 def auth(request):
     token = request.COOKIES.get('jwt')
     

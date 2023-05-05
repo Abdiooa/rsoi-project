@@ -1,15 +1,15 @@
 import sys
 import os
-
+import random
+import string
 from confluent_kafka import Consumer, KafkaException, KafkaError
 
 if __name__ == "__main__":
-    topics = ['dmqj25d7-users']
-    
+    topics = ['users-statistic']
     conf = {
-        'bootstrap.servers': 'localhost:9092',
+        'bootstrap.servers': '157.230.71.224:9092,146.190.188.54:9092', 
         'session.timeout.ms': 6000,
-        'group.id': 'dmqj25d7aa-consumer',
+        'group.id': 'dmqj25d74voir-consumer',
         'default.topic.config': {'auto.offset.reset': 'smallest'}
     }
     c = Consumer(**conf)
