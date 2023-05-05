@@ -1,0 +1,40 @@
+name: Build Project
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+env:
+  DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+  REGISTRY: "registry.digitalocean.com/rsoi-project"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v2
+      - name: Build Images
+        run: docker compose build
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN_KEY }}
+      - name: Login to docker container registry
+        run: doctl registry login --expiry-seconds 1200
+      - name: Push image in to Digital ocean Container Registry
+        run: docker compose push
+      - name: k8s cluster kubeconfig
+        run: |
+          doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 rsoi-project-k8s
+      - name: Deployment to the cluster
+        run: |
+          cd k8s
+          helm upgrade --install postgres postgres-chart/
+          helm upgrade --install services services-chart/
+          kubectl apply -f load-Balancer.yaml
+          sleep 120
