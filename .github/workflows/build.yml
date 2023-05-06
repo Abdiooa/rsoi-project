@@ -30,7 +30,7 @@ jobs:
         run: docker compose push
       - name: k8s cluster kubeconfig
         run: |
-          doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 rsoi-project-k8s
+          doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 cluster-rsoi-project
       - name: Deployment to the cluster
         run: |
           cd k8s
