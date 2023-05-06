@@ -2,7 +2,7 @@ loyalty:
   service:
     port: 8050
     image:
-      name: abdiaoo/loyaltyservice
+      name: registry.digitalocean.com/rsoi-project/loyaltyservice
       version: "latest"
     database:
       name: loyalties
@@ -10,7 +10,7 @@ payment:
   service:
     port: 8060
     image:
-      name: abdiaoo/paymentservice
+      name: registry.digitalocean.com/rsoi-project/paymentservice
       version: "latest"
     database:
       name: payments
@@ -18,7 +18,7 @@ reservation:
   service:
     port: 8070
     image:
-      name: abdiaoo/reservationservice
+      name: registry.digitalocean.com/rsoi-project/reservationservice
       version: "latest"
     database:
       name: reservations
@@ -26,7 +26,7 @@ session:
   service:
     port: 8040
     image:
-      name: abdiaoo/sessionservice
+      name: registry.digitalocean.com/rsoi-project/sessionservice
       version: "latest"
     database:
       name: session
@@ -34,14 +34,14 @@ reports:
   service:
     port: 8030
     image:
-      name: abdiaoo/reportservice
+      name: registry.digitalocean.com/rsoi-project/reportservice
       version: "latest"
     database:
       name: reports
 gateway:
   service:
-    port: 8090
+    port: 8080
     image:
-      name: abdiaoo/gatewayservice
+      name: registry.digitalocean.com/rsoi-project/gatewayservice
       version: "latest"
     isGateway: true
