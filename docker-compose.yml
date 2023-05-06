@@ -1,7 +1,7 @@
 version: "3"
 services:
   gatewayservice:
-    image: abdiaoo/gatewayservice
+    image: registry.digitalocean.com/rsoi-project/gatewayservice
     build:
       context: ./Gatewayservice
     restart: always
@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/app/Gatewayservice
   paymentservice:
-    image: abdiaoo/paymentservice
+    image: registry.digitalocean.com/rsoi-project/paymentservice
     build:
       context: ./PaymentService
     restart: always
@@ -19,7 +19,7 @@ services:
     volumes:
       - .:/app/PaymentService
   loyaltyservice:
-    image: abdiaoo/loyaltyservice
+    image: registry.digitalocean.com/rsoi-project/loyaltyservice
     build:
       context: ./LoyaltyService
     restart: always
@@ -28,7 +28,7 @@ services:
     volumes:
       - .:/app/LoyaltyService
   reservationservice:
-    image: abdiaoo/reservationservice
+    image: registry.digitalocean.com/rsoi-project/reservationservice
     build:
       context: ./ReservationService
     restart: always
@@ -37,7 +37,7 @@ services:
     volumes:
       - .:/app/ReservationService
   sessionservice:
-    image: abdiaoo/sessionservice
+    image: registry.digitalocean.com/rsoi-project/sessionservice
     build:
       context: ./Session_Service
     restart: always
@@ -46,7 +46,7 @@ services:
     volumes:
       - .:/app/Session_Service
   reportservice:
-    image: abdiaoo/reportservice
+    image: registry.digitalocean.com/rsoi-project/reportservice
     build:
       context: ./Report_Service
     restart: always
