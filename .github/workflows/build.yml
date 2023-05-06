@@ -24,11 +24,10 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_API_TOKEN_KEY }}
-      - name: Login to docker container registry
-        run: doctl registry login --expiry-seconds 1200
       - name: voir images
         run: docker images
-      
+      - name: Login to docker container registry
+        run: doctl registry login --expiry-seconds 1200
       - name: Push Loyalty image in to Digital ocean Container Registry
         run: docker push registry.digitalocean.com/rsoi-project/loyaltyservice:latest
       - name: Push Payment image in to Digital ocean Container Registry
