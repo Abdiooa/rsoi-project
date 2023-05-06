@@ -1,6 +1,6 @@
 domain: com
 service:
-  port: 8090
+  port: 8080
   isGateway:
   image:
     name:
