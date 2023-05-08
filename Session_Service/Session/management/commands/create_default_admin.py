@@ -1,0 +1,18 @@
+from django.core.management.base import BaseCommand
+from Session.models import Users
+
+class Command(BaseCommand):
+    help = 'Creates the default admin user.'
+    def handle(self, *args, **options):
+        if Users.objects.filter(role='admin').exists():
+            self.stdout.write(self.style.WARNING('An admin user already exists. Skipping default admin creation.'))
+            return
+        user =  Users(
+            username = 'admin',
+            role = 'admin',
+            email = 'admin@example.com',
+            password = 'Abdi2000*',
+            name = "Admin"
+        )
+        user.save()
+        self.stdout.write(self.style.SUCCESS('Default admin user created successfully.'))
