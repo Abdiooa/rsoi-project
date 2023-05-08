@@ -28,10 +28,10 @@ jobs:
         run: docker images
       - name: Login to docker container registry
         run: doctl registry login --expiry-seconds 1200
-      - name: Push Loyalty image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/loyaltyservice:latest
       - name: Push Payment image in to Digital ocean Container Registry
         run: docker push registry.digitalocean.com/rsoi-project/paymentservice:latest
+      - name: Push Loyalty image in to Digital ocean Container Registry
+        run: docker push registry.digitalocean.com/rsoi-project/loyaltyservice:latest
       - name: Push Session image in to Digital ocean Container Registry
         run: docker push registry.digitalocean.com/rsoi-project/sessionservice:latest
       - name: Push Report image in to Digital ocean Container Registry
