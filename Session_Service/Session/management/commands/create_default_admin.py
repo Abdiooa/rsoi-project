@@ -8,11 +8,13 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('An admin user already exists. Skipping default admin creation.'))
             return
         user =  Users(
-            username = 'admin',
+            username = "Admin",
+            name = "Abdi",
             role = 'admin',
+            last_name = "ousleyeh",
             email = 'admin@example.com',
             password = 'Abdi2000*',
-            name = "Admin"
+            
         )
         user.save()
         self.stdout.write(self.style.SUCCESS('Default admin user created successfully.'))
