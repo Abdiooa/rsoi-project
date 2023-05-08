@@ -3,6 +3,7 @@ from Session.models import Users
 
 class Command(BaseCommand):
     help = 'Creates the default admin user.'
+
     def handle(self, *args, **options):
         if Users.objects.filter(role='admin').exists():
             self.stdout.write(self.style.WARNING('An admin user already exists. Skipping default admin creation.'))
@@ -12,9 +13,8 @@ class Command(BaseCommand):
             name = "Abdi",
             role = 'admin',
             last_name = "ousleyeh",
-            email = 'admin@example.com',
-            password = 'Abdi2000*',
-            
+            email = 'admin@example.com'
         )
+        user.set_password('Abdi2000*')
         user.save()
         self.stdout.write(self.style.SUCCESS('Default admin user created successfully.'))
