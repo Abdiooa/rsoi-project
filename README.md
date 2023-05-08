@@ -13,3 +13,5 @@ C'est quoi le probleme
 
 
 ajouter plus des memoires
+
+ajouter la creation par defaut d'un utilisateur
