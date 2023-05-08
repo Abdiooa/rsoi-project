@@ -1,6 +1,5 @@
 FROM python:3.9
 
-
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app/Session_Service
@@ -11,5 +10,8 @@ RUN pip install -r requirements.txt
 
 COPY . /app/Session_Service
 
+RUN python manage.py makemigrations
+RUN python manage.py migrate
+RUN python manage.py create_default_admin
 
-CMD ["sh", "-c", "/usr/local/bin/python manage.py makemigrations && /usr/local/bin/python manage.py migrate create_default_admin && /usr/local/bin/python && /usr/local/bin/python manage.py runserver 0.0.0.0:8040"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8040"]
