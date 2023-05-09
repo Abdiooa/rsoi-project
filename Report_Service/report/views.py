@@ -9,7 +9,7 @@ import json
 import aiohttp
 from rest_framework.exceptions import AuthenticationFailed
 from confluent_kafka import Consumer, KafkaException, KafkaError
-from adrf.decorators import api_view
+from rest_framework.decorators import api_view
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 import asyncio
@@ -31,6 +31,19 @@ conf = {
 }
 
 @api_view(['GET'])
+def report_by_booking(request):
+    try:
+        auth(request)
+        data = consumer('payment-statistic')
+        if len(data) != 0:
+            dictOfList = {i: data[i] for i in range(0, len(data))}
+            return JsonResponse(dictOfList, status=status.HTTP_200_OK,safe=False,json_dumps_params={'ensure_ascii': False})
+        return JsonResponse(data,status=status.HTTP_204_NO_CONTENT,safe=False,json_dumps_params={'ensure_ascii': False})
+    except Exception as e:
+        return JsonResponse({'message':'{}'.format(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
 def report_by_users(request):
     try:
         auth(request)
@@ -39,6 +52,18 @@ def report_by_users(request):
             dictOfList = {i: data[i] for i in range(0, len(data))}
             return JsonResponse(dictOfList,status=status.HTTP_200_OK)
         return JsonResponse({"message": "No content"}, status=status.HTTP_204_NO_CONTENT, safe=False)
+    except Exception as e:
+        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+@api_view(['GET'])
+def report_by_hotels(request):
+    try:
+        auth(request)
+        hotels = requests.get("https://reservationsvc:8070/api/v1/reservations/static", cookies=request.COOKIES)
+        if hotels.status_code == 200:
+            hotels = hotels.content.decode('utf8').replace("'", '"')
+            hotels = json.loads(hotels)
+            return JsonResponse(hotels, safe=False, status=status.HTTP_200_OK)
+        return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -61,17 +86,6 @@ def auth(request):
     return payload
 
 
-@api_view(['GET'])
-def report_by_booking(request):
-    try:
-        auth(request)
-        data = consumer('payment-statistic')
-        if len(data) != 0:
-            dictOfList = {i: data[i] for i in range(0, len(data))}
-            return JsonResponse(dictOfList, status=status.HTTP_200_OK,safe=False,json_dumps_params={'ensure_ascii': False})
-        return JsonResponse(data,status=status.HTTP_204_NO_CONTENT,safe=False,json_dumps_params={'ensure_ascii': False})
-    except Exception as e:
-        return JsonResponse({'message':'{}'.format(e)},status=status.HTTP_400_BAD_REQUEST)
 
 def consumer(topic):
     resp = list()
@@ -109,17 +123,3 @@ def consumer(topic):
         
         c.close()
         return resp
-
-
-@api_view(['GET'])
-def report_by_hotels(request):
-    try:
-        auth(request)
-        hotels = requests.get("https://reservationsvc:8070/api/v1/reservations/static", cookies=request.COOKIES)
-        if hotels.status_code == 200:
-            hotels = hotels.content.decode('utf8').replace("'", '"')
-            hotels = json.loads(hotels)
-            return JsonResponse(hotels, safe=False, status=status.HTTP_200_OK)
-        return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
-    except Exception as e:
-        return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
