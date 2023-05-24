@@ -24,7 +24,7 @@ import random
 import string
 
 conf = {
-    'bootstrap.servers': '157.230.71.224:9092,146.190.188.54:9092', 
+    'bootstrap.servers': '104.248.197.192:9092,134.209.199.44:9092', 
     'session.timeout.ms': 6000,
     'group.id': 'dmqj25d74voir-consumer',
     'default.topic.config': {'auto.offset.reset': 'smallest'}
