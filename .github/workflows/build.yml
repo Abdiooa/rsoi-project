@@ -51,6 +51,7 @@ jobs:
           sleep 180
       - name: Deployment to the cluster
         run: |
+          cd k8s
           helm upgrade --install postgres postgres-chart/
           helm upgrade --install services services-chart/
           kubectl apply -f load-Balancer.yaml
