@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    New user
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <table class="table">
+            <thead>
+            <tr>
+                <th style="border-color: white;" colspan="3">
+                    <h3 style="text-align: center">New user</h3>
+                </th>
+            </tr>
+            </thead>
+            <tbody style="background-color: white; padding: 20px;">
+            <tr>
+                <td>
+                    <div style="margin: 10px;">
+                        {% if error == 'success' %}
+                            <div class="alert alert-success">Added</div>
+                        {% elif error %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endif %}
+                        <form class="form-horizontal" method="post">
+                            {% csrf_token %}
+                            <fieldset>
+                                {% for field in form %}
+                                    <div class="form-group{% if field.errors %} has-error{% endif %}">
+                                        <label class="control-label">{{ field.label }}</label>
+                                        <div class="controls">{{ field }}</div>
+                                        {% if field.errors %}
+                                            <p class="help-block">{{ field.errors|first }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </fieldset>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button type="submit" class="btn btn-success">Save</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

@@ -11,6 +11,7 @@ urlpatterns = [
     path('hotel_info/<str:hotelUid>/', hotel_info, name="hotel_info"),
     path('admin', admin, name="admin"),
     path('add-hotel', add_hotel_admin, name="add_hotel"),
+    path('add-user', add_user, name="add_user"),
     path('delete-hotel', delete_hotel_admin, name="delete_hotel"),
     path('all-users', all_users, name="all_users"),
     path('add_booking', add_booking, name="add_booking"),

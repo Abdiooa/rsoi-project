@@ -5,7 +5,7 @@ from django.core.paginator import Paginator,EmptyPage
 from rest_framework import status
 from rest_framework.response import Response
 from django.http import JsonResponse
-from .forms import UserRegistrationForm,LoginForm,NewHotel,DeleteHotel
+from .forms import UserRegistrationForm,LoginForm,NewHotel,DeleteHotel,NewUser
 from django.http import HttpResponseRedirect, JsonResponse
 import json
 import datetime
@@ -494,6 +494,34 @@ async def add_hotel_admin(request):
     return response
 
 
+async def add_user(request):
+    error = None
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if request.method == "GET":
+        form = NewUser()
+    if request.method == "POST":
+        form = NewUser(data=request.POST)
+        error = 'success'
+        if form.is_valid():
+            async with aiohttp.ClientSession() as client_session:
+                async with client_session.post("sessionsvc:8040/api/v1/session/register",json={
+                                        'name': form.data['name'],
+                                        'username': form.data['username'],
+                                        'password': form.data['password'],
+                                        'email': form.data['email'],
+                                        'role': form.data['role']
+                                    },
+                                    cookies=request.COOKIES) as res:
+                    new_user = await res.json()
+            if res.status != 200:
+                error = "errors"
+        else:
+            error = "errors"
+    response = render(request, 'new_user.html', {'form': form, 'user': data, 'error': error})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
 
 async def booking_info(request,reservationUid):
     is_authenticated, request, session = cookies(request)
