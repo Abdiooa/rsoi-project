@@ -40,13 +40,13 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_API_TOKEN_KEY }}
-#       - name: k8s cluster kubeconfig
-#         run: |
-#           doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 cluster-rsoi-project
-#       - name: Deployment to the cluster
-#         run: |
-#           cd k8s
-#           helm upgrade --install postgres postgres-chart/
-#           helm upgrade --install services services-chart/
-#           kubectl apply -f load-Balancer.yaml
-#           sleep 120
+      - name: k8s cluster kubeconfig
+        run: |
+          doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 rsoi-cluster-project
+      - name: Deployment to the cluster
+        run: |
+          cd k8s
+          helm upgrade --install postgres postgres-chart/
+          helm upgrade --install services services-chart/
+          kubectl apply -f load-Balancer.yaml
+          sleep 120
