@@ -43,15 +43,16 @@ jobs:
       - name: k8s cluster kubeconfig
         run: |
           doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 rsoi-cluster-project
-      - name: Uninstall olds
-        run: |
-          cd k8s
-          helm uninstall services postgres
-          kubectl delete -f load-Balancerù
-          sleep 180
+#       - name: Uninstall olds
+#         run: |
+#           cd k8s
+#           helm uninstall services postgres
+#           kubectl delete -f load-Balancerù
+#           sleep 180
       - name: Deployment to the cluster
         run: |
           cd k8s
+          kubectl delete -f load-Balancer.yaml
           helm upgrade --install postgres postgres-chart/
           helm upgrade --install services services-chart/
           kubectl apply -f load-Balancer.yaml
