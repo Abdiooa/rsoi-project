@@ -7,8 +7,8 @@ on:
     branches:
       - develop
 env:
+  DOCKERHUB_USERNAME: abdiaoo
   DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-  REGISTRY: "registry.digitalocean.com/rsoi-project"
 jobs:
   build:
     name: Build
@@ -20,33 +20,33 @@ jobs:
       - uses: docker/setup-buildx-action@v2
       - name: Build Images
         run: docker compose build
+      - name: Voir les images
+        run: docker images
+      - name: Login to Docker Hub
+        run: docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+      - name: Push Payment image in to DockerHub
+        run: docker push abdiaoo/paymentservice:latest
+      - name: Push Loyalty image in to DockerHub
+        run: docker push abdiaoo/loyaltyservice:latest
+      - name: Push Session image in to DockerHub
+        run: docker push abdiaoo/sessionservice:latest
+      - name: Push Report image in to DockerHub
+        run: docker push abdiaoo/reportservice:latest
+      - name: Push Reservation image in to DockerHub
+        run: docker push abdiaoo/reservationservice:latest
+      - name: Push Gateway image in to DockerHub
+        run: docker push abdiaoo/gatewayservice:latest
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_API_TOKEN_KEY }}
-      - name: voir images
-        run: docker images
-      - name: Login to docker container registry
-        run: doctl registry login --expiry-seconds 1200
-      - name: Push Payment image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/paymentservice:latest
-      - name: Push Loyalty image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/loyaltyservice:latest
-      - name: Push Session image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/sessionservice:latest
-      - name: Push Report image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/reportservice:latest
-      - name: Push Reservation image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/reservationservice:latest
-      - name: Push Gateway image in to Digital ocean Container Registry
-        run: docker push registry.digitalocean.com/rsoi-project/gatewayservice:latest
-      - name: k8s cluster kubeconfig
-        run: |
-          doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 cluster-rsoi-project
-      - name: Deployment to the cluster
-        run: |
-          cd k8s
-          helm upgrade --install postgres postgres-chart/
-          helm upgrade --install services services-chart/
-          kubectl apply -f load-Balancer.yaml
-          sleep 120
+#       - name: k8s cluster kubeconfig
+#         run: |
+#           doctl kubernetes cluster kubeconfig save --expiry-seconds 1200 cluster-rsoi-project
+#       - name: Deployment to the cluster
+#         run: |
+#           cd k8s
+#           helm upgrade --install postgres postgres-chart/
+#           helm upgrade --install services services-chart/
+#           kubectl apply -f load-Balancer.yaml
+#           sleep 120
