@@ -23,15 +23,16 @@ class NewHotel(forms.Form):
     # photo = forms.ImageField(label='Hotel Photos:', required=False)
 
 class NewUser(forms.Form):
-    name = forms.CharField(max_length=255)
-    username = forms.CharField(unique= True,max_length=255)
-    password = forms.CharField(max_length=255)
-    email = forms.CharField(unique=True,max_length=255)
+    name = forms.CharField(label='Name:', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    username = forms.CharField(label='Username:', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    password = forms.CharField(label='Password:', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(label='Email:', widget=forms.EmailInput(attrs={'class': 'form-control'}))
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'User'),
     ]
-    role = forms.ChoiceField(choices=ROLE_CHOICES)
+    role = forms.ChoiceField(label='Role:', choices=ROLE_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+
 
 class DeleteHotel(forms.Form):
     hotelUid = forms.CharField(label='Hotel UUID:', widget=forms.TextInput(attrs={'class': 'form-control'}))
