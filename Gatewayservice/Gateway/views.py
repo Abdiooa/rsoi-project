@@ -433,7 +433,7 @@ def static_booking(request):
         dictlist = list()
         for key,value in static_booking.items():
             temp = [key,value]
-            dictlist.append
+            dictlist.append(temp)
     except Exception:
         dictlist = None
     response = render(request, 'static_booking.html', {'static_booking': dictlist, 'user': data})
