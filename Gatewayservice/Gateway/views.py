@@ -429,9 +429,9 @@ def static_booking(request):
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
     try:
-        static_booking = requests.get("http://reportssvc:8030/api/v1/reports/booking", cookies=request.cookies).json()
+        static_books = requests.get("http://reportssvc:8030/api/v1/reports/booking", cookies=request.COOKIES).json()
         dictlist = list()
-        for key,value in static_booking.items():
+        for key,value in static_books.items():
             temp = [key,value]
             dictlist.append(temp)
     except Exception:
