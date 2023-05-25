@@ -504,8 +504,10 @@ async def add_user(request):
         form = NewUser(data=request.POST)
         error = 'success'
         if form.is_valid():
+            if not re.compile("^([A-Za-z0-9]+)+$").match(form.data['username']):
+                return render(request, 'signup.html', {'form': form, 'error': 'No valid login'})
             async with aiohttp.ClientSession() as client_session:
-                async with client_session.post("sessionsvc:8040/api/v1/session/register",json={
+                async with client_session.post("http://sessionsvc:8040/api/v1/session/register",json={
                                         'name': form.data['name'],
                                         'username': form.data['username'],
                                         'password': form.data['password'],
