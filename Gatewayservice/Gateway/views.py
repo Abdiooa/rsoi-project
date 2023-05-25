@@ -509,6 +509,7 @@ async def add_user(request):
             async with aiohttp.ClientSession() as client_session:
                 async with client_session.post("http://sessionsvc:8040/api/v1/session/register",json={
                                         'name': form.data['name'],
+                                        "last_name": form.data['last_name'],
                                         'username': form.data['username'],
                                         'password': form.data['password'],
                                         'email': form.data['email'],
