@@ -436,7 +436,7 @@ def static_booking(request):
             dictlist.append(temp)
     except Exception:
         dictlist = None
-    response = render(request, 'static_booking.html', {'static_booking': dictlist, 'user': data})
+    response = render(request, 'static_booking.html', {'static_bookings': dictlist, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
