@@ -428,17 +428,14 @@ def static_booking(request):
         response = HttpResponseRedirect('/index')
         response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
         return response
-    report = requests.get("http://reportssvc:8030/api/v1/report/booking", cookies=session.cookies)
-    if report.status_code == 200:
-        report = report.content.decode('utf8').replace("'", '"')
-        report = json.loads(report)
+    try:
+        static_booking = requests.get("http://reportssvc:8030/api/v1/reports/booking", cookies=request.cookies).json()
         dictlist = list()
-        for key, value in report.items():
+        for key,value in static_booking.items():
             temp = [key,value]
-            dictlist.append(temp)
-    else:
+            dictlist.append
+    except Exception:
         dictlist = None
-        
     response = render(request, 'static_booking.html', {'static_booking': dictlist, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
