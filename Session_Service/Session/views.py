@@ -43,13 +43,17 @@ def login(request):
     
     if not user.check_password(password):
         raise AuthenticationFailed('Incorrect Password!')
-    
+    profile_info = {
+        'first_name': user.name,
+        'last_name': user.username,
+    }
     payload = {
         'user_uid': str(user.user_uid),
         'username': str(username),
         'role': str(user.role),
         'email': str(user.email),
-        "scope" : 'openid profile email',
+        'profile':profile_info,
+        'scope': 'openid profile email',
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
         'iat': datetime.datetime.utcnow(),
     }
@@ -122,11 +126,17 @@ def refresh(request):
     except Exception as e:
         raise ParseError('Parse error!')
     
+    profile_info = {
+        'first_name': payload['profile']['first_name'],
+        'last_name': payload['profile']['last_name'],
+    }
     payload = {
         'user_uid': str(payload['user_uid']),
         'username': str(payload['username']),
         'role': str(payload['role']),
         'email': str(payload['email']),
+        'profile': profile_info,
+        'scope': 'openid profile email',
         'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
         'iat': datetime.datetime.utcnow()
     }
