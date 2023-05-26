@@ -38,25 +38,7 @@ conf = {
     'default.topic.config': {'auto.offset.reset': 'smallest'}
 }
 
-def users_static(request):
-    is_authenticated, request, session = cookies(request)
-    data = auth(request)
-    if data['role'] != 'admin':
-        response = HttpResponseRedirect('/index')
-        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
-        return response
-    try:
-        static_users = requests.get("http://reportssvc:8030/api/v1/reports/users", cookies=request.COOKIES).json()
-        dictlist = list()
-        for key, value in static_users.items():
-            temp = [key, value]
-            dictlist.append(temp)
-    except Exception:
-        dictlist = None
-    response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
-    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
-        if is_authenticated else response.delete_cookie('jwt')
-    return response
+
 
 
 def pay_room(request, paymentUid):
@@ -77,8 +59,11 @@ def pay_room(request, paymentUid):
         totalcost = int(hotel['price']) * (period.days)
         pay = requests.post("http://paymentsvc:8060/api/v1/payment/pay/{}"
                             .format(paymentUid), json={'price': totalcost}, cookies=request.COOKIES)
-        
+        payedpayment = requests.get("http://paymentsvc:8060/api/v1/payment/{}"
+                            .format(booking['paymentUid']), cookies=session.cookies).json()
         if pay.status_code == 200:
+            q_effectued_payment ={"paymentUid":payedpayment['paymentUid'],"user_uid":data["user_uid"],"email":data['email'],"username":data["username"],'name':hotel['name'],'reservationUid':booking['reservationUid'],"hotel_uid":hotel["hotel_uid"],"Payed Price":payedpayment['price'],"status":payedpayment['status'],"address":hotel["address"],"country":hotel["country"],"city":hotel["city"]}
+            producer(q_effectued_payment,"effecpayment-statistic")
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['reservationUid']))
             booking_all = requests.get("http://reservationsvc:8070/api/v1/reservations", cookies=session.cookies)
             if booking_all.status_code != 200:
@@ -113,7 +98,6 @@ def pay_room(request, paymentUid):
             if is_authenticated else response.delete_cookie('jwt')
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f"index() executed in {elapsed_time:.4f} seconds") 
         return response
 
 
@@ -439,6 +423,46 @@ def static_booking(request):
     print(dictlist)
     response = render(request, 'static_booking.html', {'static_bookings': dictlist, 'user': data})
     response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+def users_static(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role'] != 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True)
+        return response
+    try:
+        static_users = requests.get("http://reportssvc:8030/api/v1/reports/users", cookies=request.COOKIES).json()
+        dictlist = list()
+        for key, value in static_users.items():
+            temp = [key, value]
+            dictlist.append(temp)
+    except Exception:
+        dictlist = None
+    response = render(request, 'users_static.html', {'all_users': dictlist, 'user': data})
+    response.set_cookie(key='jwt', value=session.cookies.get('jwt'), httponly=True) \
+        if is_authenticated else response.delete_cookie('jwt')
+    return response
+
+def static_payments(request):
+    is_authenticated, request, session = cookies(request)
+    data = auth(request)
+    if data['role']!= 'admin':
+        response = HttpResponseRedirect('/index')
+        response.set_cookie(key='jwt',value=session.cookies.get('jwt'),httponly=True)
+        return response
+    try:
+        static_payments = request.get("http://reportssvc:8030/api/v1/reports/paymenteffec", cookies=request.COOKIES).json()
+        dictlist = list()
+        for key, value in static_payments.items():
+            temp = [key,value]
+            dictlist.append(temp)
+    except Exception:
+        dictlist = None
+    response = render(request,'payments_static.html',{'all_payments':dictlist,'user':data})
+    response.set_cookie(key='jwt',value=session.cookies.get('jwt'),httponly=True) \
         if is_authenticated else response.delete_cookie('jwt')
     return response
 

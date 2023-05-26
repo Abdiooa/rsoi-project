@@ -28,7 +28,6 @@ def payer(request,paymentUid):
         auth(request)
         payment = Payment.objects.get(paymentUid=paymentUid)
         payment.status = "PAID"
-        print(payment.status)
         pay_loyalty = requests.patch("http://loyaltysvc:8050/api/v1/loyalty/edit_balance",
                                     json={'status': payment.status, 'price': request.data['price']},
                                     cookies=request.COOKIES)

@@ -19,6 +19,7 @@ urlpatterns = [
     path('pay_room/<str:paymentUid>', pay_room, name="pay_room"),
     path('del_booking/<str:reservationUid>', del_booking, name="del_booking"),
     path('static_booking', static_booking, name="static_booking"),
+    path('static_payments', static_payments, name="static_payments"),
     path('users-static', users_static, name="users_static"),
     # path('all-booking-static', all_booking_static, name="all_booking_static"),
 ]

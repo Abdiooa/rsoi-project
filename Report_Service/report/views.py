@@ -42,6 +42,18 @@ def report_by_booking(request):
     except Exception as e:
         return JsonResponse({'message':'{}'.format(e)},status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['GET'])
+def report_by_payments(request):
+    try:
+        auth(request)
+        data = consumer('effecpayment-statistic')
+        if len(data)!=0:
+            dictOfList = {i:data[i] for i in range(0,len(data))}
+            return JsonResponse(dictOfList,status=status.HTTP_200_OK,safe=False,json_dumps_params={'ensure_ascii': False})
+        return JsonResponse({"message":"No Content"},status=status.HTTP_204_NO_CONTENT,safe=False)
+    except Exception as e:
+        return JsonResponse({"message":'{}'.format(e)},status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 def report_by_users(request):
@@ -67,6 +79,7 @@ def report_by_hotels(request):
         return JsonResponse({"detail": "No content in queue"}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
         return JsonResponse({'message': '{}'.format(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def bytes_to_json(byte):
