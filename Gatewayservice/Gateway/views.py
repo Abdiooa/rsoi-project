@@ -61,8 +61,10 @@ def pay_room(request, paymentUid):
                             .format(paymentUid), json={'price': totalcost}, cookies=request.COOKIES)
         payedpayment = requests.get("http://paymentsvc:8060/api/v1/payment/{}"
                             .format(booking['paymentUid']), cookies=session.cookies).json()
+        print(payedpayment)
         if pay.status_code == 200:
             q_effectued_payment ={"paymentUid":payedpayment['paymentUid'],"user_uid":data["user_uid"],"email":data['email'],"username":data["username"],'name':hotel['name'],'reservationUid':booking['reservationUid'],"hotel_uid":hotel["hotel_uid"],"Payed_Price":payedpayment['price'],"status":payedpayment['status'],"address":hotel["address"],"country":hotel["country"],"city":hotel["city"]}
+            print(q_effectued_payment)
             producer(q_effectued_payment,"effecpayment-statistic")
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['reservationUid']))
             booking_all = requests.get("http://reservationsvc:8070/api/v1/reservations", cookies=session.cookies)
