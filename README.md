@@ -25,3 +25,4 @@ ressaie
 encore ressaie
 
 je pense que cette la est la derniere pour ce soir
+ajout d'un autre endpoint de statistique
