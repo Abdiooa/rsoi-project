@@ -51,7 +51,7 @@ def pay_room(request, paymentUid):
         hotel = requests.get("http://reservationsvc:8070/api/v1/hotel/{}"
                             .format(booking['hotel_uid']), cookies=session.cookies).json()
         payment = requests.get("http://paymentsvc:8060/api/v1/payment/{}"
-                            .format(booking['paymentUid']), cookies=session.cookies).json()
+                            .format(paymentUid), cookies=session.cookies).json()
         
         date_start = datetime.datetime.strptime(booking['startDate'], "%Y-%m-%d")
         date_end = datetime.datetime.strptime(booking['endDate'], "%Y-%m-%d")
@@ -60,10 +60,10 @@ def pay_room(request, paymentUid):
         pay = requests.post("http://paymentsvc:8060/api/v1/payment/pay/{}"
                             .format(paymentUid), json={'price': totalcost}, cookies=request.COOKIES)
         payedpayment = requests.get("http://paymentsvc:8060/api/v1/payment/{}"
-                            .format(booking['paymentUid']), cookies=session.cookies).json()
+                            .format(paymentUid), cookies=session.cookies).json()
         print(payedpayment)
         if pay.status_code == 200:
-            q_effectued_payment ={"paymentUid":payedpayment['paymentUid'],"user_uid":data["user_uid"],"email":data['email'],"username":data["username"],'name':hotel['name'],'reservationUid':booking['reservationUid'],"hotel_uid":hotel["hotel_uid"],"Payed_Price":payedpayment['price'],"status":payedpayment['status'],"address":hotel["address"],"country":hotel["country"],"city":hotel["city"]}
+            q_effectued_payment ={"paymentUid":paymentUid,"user_uid":data["user_uid"],"email":data['email'],"username":data["username"],'name':hotel['name'],'reservationUid':booking['reservationUid'],"hotel_uid":hotel["hotel_uid"],"Payed_Price":payedpayment['price'],"status":payedpayment['status'],"address":hotel["address"],"country":hotel["country"],"city":hotel["city"]}
             print(q_effectued_payment)
             producer(q_effectued_payment,"effecpayment-statistic")
             response = HttpResponseRedirect('/booking_info/{}'.format(request.POST['reservationUid']))
