@@ -61,7 +61,7 @@ def pay_room(request, paymentUid):
         totalcost = int(hotel['price']) * (period.days)
         pay = requests.post("http://paymentsvc:8060/api/v1/payment/pay/{}"
                             .format(paymentUid), json={'price': totalcost}, cookies=request.COOKIES)
-        print("passer)
+        print("passer")
         payedpayment = requests.get("http://paymentsvc:8060/api/v1/payment/{}".format(paymentUid), cookies=session.cookies).json()
         print(data)
         print(payedpayment)
